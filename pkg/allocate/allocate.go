@@ -176,17 +176,18 @@ func GetIPRange(ip net.IP, ipnet net.IPNet) (net.IP, net.IP, error) {
 	var masklong big.Int
 	// We need to generate the largest number...
 	// Let's try to figure out if it's IPv4 or v6
-	var maxval *big.Int
+	var maxval big.Int
 	if len(lowestiplong.Bytes()) == 16 {
 		// It's v6
-		// 340282366920938463463374607431768211455
-		maxval.SetString("340282366920938463463374607431768211455", 10)
+		// Maximum IPv6 value: 0xffffffffffffffffffffffffffffffff
+		maxval.SetString("0xffffffffffffffffffffffffffffffff", 0)
 	} else {
 		// It's v4
-		// 4294967295
-		maxval = big.NewInt(4294967295)
+		// Maximum IPv4 value: 4294967295
+		maxval.SetUint64(4294967295)
 	}
-	masklong.Rsh(maxval, uint(ones))
+
+	masklong.Rsh(&maxval, uint(ones))
 	// logging.Debugf("max val:          %b", &maxval)
 	// logging.Debugf("mask:             %b", &masklong)
 
