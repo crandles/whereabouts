@@ -42,5 +42,12 @@ var _ = Describe("Allocation operations", func() {
 		Expect(err.Error()).To(HavePrefix("Net mask is too short"))
 
 	})
+	It("Converts an IP to 16 bytes", func() {
+		err := tryIt("2001::0/116")
+		Expect(err).NotTo(HaveOccurred())
+
+		err = tryIt("192.168.1.100/24")
+		Expect(err).NotTo(HaveOccurred())
+	})
 
 })

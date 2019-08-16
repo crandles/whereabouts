@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/dougbtv/whereabouts/pkg/logging"
 	"github.com/dougbtv/whereabouts/pkg/types"
+	"math/big"
 	"net"
 	"strconv"
 	"strings"
@@ -210,4 +211,42 @@ func longToIP4(inIPInt uint32) net.IP {
 	b2 := strconv.FormatInt((ipInt>>8)&0xff, 10)
 	b3 := strconv.FormatInt((ipInt & 0xff), 10)
 	return net.ParseIP(b0 + "." + b1 + "." + b2 + "." + b3)
+}
+
+func tryIt(inputiprange string) error {
+	logging.Debugf("Input range: %s", inputiprange)
+	theip, ipnet, err := net.ParseCIDR(inputiprange)
+	if err != nil {
+		logging.Errorf("Couldn't parse IP: %s", inputiprange)
+		return fmt.Errorf("Couldn't parse IP: %s", inputiprange)
+	}
+
+	logging.Debugf("The IP: %s", theip)
+	logging.Debugf("The IPnet: %+v", ipnet)
+	// logging.Debugf("The IPnet IP: %+v", ipnet.IP)
+	// logging.Debugf("The IPnet IPMask: %+v", ipnet.IPMask)
+	theonesix := theip // .To16()
+	// Can I change a byte? YES!
+	theonesix[15] = 255
+	logging.Debugf("theonesix: %+v", theonesix)
+	for i := 0; i < len(theonesix); i++ {
+		logging.Debugf("byte[%v]: %x ", i, theonesix[i])
+	}
+	// theonesix++
+	// logging.Debugf("theonesixPLUSONE: %+v", theonesix)
+	// Can I access the bytes in the int? YES
+	asint := ipv6ToInt(theonesix)
+	logging.Debugf("asint: %v", asint)
+	intbytes := asint.Bytes()
+	for i := 0; i < len(intbytes); i++ {
+		logging.Debugf("asint[%v]: %x ", i, intbytes[i])
+	}
+
+	return nil
+}
+
+func ipv6ToInt(IPv6Addr net.IP) *big.Int {
+	IPv6Int := big.NewInt(0)
+	IPv6Int.SetBytes(IPv6Addr)
+	return IPv6Int
 }
