@@ -26,6 +26,7 @@ var _ = Describe("Allocation operations", func() {
 		Expect(fmt.Sprint(lastip)).To(Equal("192.168.2.255"))
 
 	})
+	// Handy IPv6 CIDR calculator: https://www.ultratools.com/tools/ipv6CIDRToRangeResult?ipAddress=2001%3A%3A0%2F28
 	It("creates an IPv6 range properly", func() {
 
 		ip, ipnet, err := net.ParseCIDR("2001::0/116")

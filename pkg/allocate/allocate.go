@@ -85,6 +85,7 @@ func IterateForAssignment(ip net.IP, ipnet net.IPNet, reservelist []string, excl
 	performedassignment := false
 MAINITERATION:
 	for i := ip2Long(firstip); ip2Long(lastip).Cmp(i) == 1; i.Add(i, big.NewInt(1)) {
+
 		// For each address see if it has been allocated
 		isallocated := false
 		for _, v := range reservelist {
@@ -103,10 +104,16 @@ MAINITERATION:
 
 		// We can try to work with the current IP
 		// However, let's skip 0-based addresses
-		// So go ahead and continue if the 4th byte equals 0
-		ipbytes := longToIP(*i).To4()
-		if ipbytes[3] == 0 {
-			continue
+		// So go ahead and continue if the 4th/16th byte equals 0
+		ipbytes := i.Bytes()
+		if isIntIPv4(i) {
+			if ipbytes[5] == 0 {
+				continue
+			}
+		} else {
+			if ipbytes[15] == 0 {
+				continue
+			}
 		}
 
 		// Lastly, we need to check if this IP is within the range of excluded subnets
@@ -219,14 +226,26 @@ func _ip2Long(ip net.IP) big.Int {
 	return long
 }
 
+// IsIPv4 checks if an IP is v4.
+func IsIPv4(checkip net.IP) bool {
+	return isIntIPv4(ip2Long(checkip))
+}
+
+func isIntIPv4(checkipint *big.Int) bool {
+	return !(len(checkipint.Bytes()) == 16)
+}
+
 func longToIP(inipint big.Int) net.IP {
-	// Determine if it's v4 or v6
+
 	var outip net.IP
+
 	// Create an IPv6 (to make it 16 bytes)
 	outip = net.ParseIP("0::")
 	intbytes := inipint.Bytes()
+
 	// logging.Debugf("length intbytes: %v", len(intbytes))
 	// This is an IPv6 address.
+
 	if len(intbytes) == 16 {
 		for i := 0; i < len(intbytes); i++ {
 			// logging.Debugf("i: %v", i)
