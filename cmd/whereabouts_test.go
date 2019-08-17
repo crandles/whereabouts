@@ -115,11 +115,7 @@ var _ = Describe("Whereabouts operations", func() {
 				"log_level" : "debug",
         "etcd_host": "127.0.0.1:2379",
         "range": "2001::0/116",
-        "exclude": [
-          "192.168.1.0/28",
-          "192.168.1.16/28"
-        ],
-        "gateway": "192.168.10.1",
+        "gateway": "2001::f:1",
         "routes": [
           { "dst": "0.0.0.0/0" }
         ]
@@ -151,7 +147,7 @@ var _ = Describe("Whereabouts operations", func() {
 			current.IPConfig{
 				Version: "6",
 				Address: mustCIDR("2001::1/116"),
-				Gateway: net.ParseIP("192.168.10.1"),
+				Gateway: net.ParseIP("2001::f:1"),
 			}))
 
 		// Release the IP
